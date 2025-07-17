@@ -5,7 +5,7 @@ const VerifyOtpForm = ({ email, switchToLogin }) => {
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [verified, setVerified] = useState(false); // ✅ track OTP verification
-
+  console.log("emial",email)
   const handleVerify = async (e) => {
     e.preventDefault();
     setMessage("Verifying...");

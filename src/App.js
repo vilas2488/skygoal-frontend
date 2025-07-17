@@ -1,10 +1,9 @@
-// App.js
 import React, { useState } from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 
 import LoginForm from "./components/LoginForm";
@@ -19,98 +18,97 @@ function App() {
     const storedUser = localStorage.getItem("authUser");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  const navigate = useNavigate();
 
   const handleLoginSuccess = (userData) => {
-    localStorage.setItem("authUser", JSON.stringify(userData)); // ✅ store in localStorage
+    localStorage.setItem("authUser", JSON.stringify(userData));
     setCurrentUser(userData);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authUser"); // ✅ remove from localStorage
+    localStorage.removeItem("authUser");
     setCurrentUser(null);
   };
 
   return (
-    <Router>
-      <div className="container py-4">
-        <h2 className="text-center mb-4">Auth App</h2>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+    <div className="container py-4">
+      <h2 className="text-center mb-4">Auth App</h2>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
 
-          <Route
-            path="/login"
-            element={
-              <LoginForm
-                switchToSignup={() => (window.location.href = "/signup")}
-                onLoginSuccess={(user) => {
-                  handleLoginSuccess(user);
-                  window.location.href = "/home";
+        <Route
+          path="/login"
+          element={
+            <LoginForm
+              switchToSignup={() => navigate("/signup")}
+              onLoginSuccess={(user) => {
+                handleLoginSuccess(user);
+                window.location.href = "/home";
+              }}
+            />
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <SignupForm
+              switchToLogin={() => navigate("/login")}
+              switchToOtp={(email) => {
+                setSignupEmail(email);
+                navigate("/verify");
+              }}
+            />
+          }
+        />
+
+        <Route
+          path="/verify"
+          element={
+            <VerifyOtpForm
+              email={signupEmail}
+              switchToLogin={() => navigate("/login")}
+            />
+          }
+        />
+
+        <Route
+          path="/home"
+          element={
+            currentUser ? (
+              <HomePage
+                currentUser={currentUser}
+                goToProfile={() => navigate("/profile")}
+                logout={() => {
+                  handleLogout();
+                  navigate("/login");
                 }}
               />
-            }
-          />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
 
-          <Route
-            path="/signup"
-            element={
-              <SignupForm
-                switchToLogin={() => (window.location.href = "/login")}
-                switchToOtp={(email) => {
-                  setSignupEmail(email);
-                  window.location.href = "/verify";
+        <Route
+          path="/profile"
+          element={
+            currentUser ? (
+              <ProfilePage
+                user={currentUser}
+                backToHome={() => (window.location.href = "/home")}
+                logout={() => {
+                  handleLogout();
+                  window.location.href = "/login";
                 }}
               />
-            }
-          />
-
-          <Route
-            path="/verify"
-            element={
-              <VerifyOtpForm
-                email={signupEmail}
-                switchToLogin={() => (window.location.href = "/login")}
-              />
-            }
-          />
-
-          <Route
-            path="/home"
-            element={
-              currentUser ? (
-                <HomePage
-                  currentUser={currentUser}
-                  goToProfile={() => (window.location.href = "/profile")}
-                  logout={() => {
-                    handleLogout();
-                    window.location.href = "/login";
-                  }}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              currentUser ? (
-                <ProfilePage
-                  user={currentUser}
-                  backToHome={() => (window.location.href = "/home")}
-                  logout={() => {
-                    handleLogout();
-                    window.location.href = "/login";
-                  }}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </div>
   );
 }
 
