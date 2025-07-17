@@ -16,7 +16,7 @@ const LoginForm = ({ switchToSignup, onLoginSuccess }) => {
         email,
         password,
       });
-
+      localStorage.setItem("token", res.data.token);
       const user = res.data.user;
       onLoginSuccess(user); // ✅ Save user in App
       navigate("/home"); // ✅ Navigate to /home
