@@ -19,7 +19,7 @@ const SignupForm = ({ switchToLogin, switchToOtp }) => {
     setMessage("Signing up...");
 
     try {
-      const res = await axios.post("http://localhost:5000/auth/signup", form);
+      const res = await axios.post("https://skygoal-backend-afez.onrender.com/auth/signup", form);
       setMessage(res.data.message);
       // ✅ switch to OTP form and pass email
       switchToOtp(form.email);
